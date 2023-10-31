@@ -1,6 +1,3 @@
-#ifndef CUDA_COMMON_H
-#define CUDA_COMMON_H
-
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 #include <stdio.h>
@@ -16,10 +13,3 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort =
 		if (abort) exit(code);
 	}
 }
-
-__global__ void scan_efficient_1G(int * input, int* auxiliry_array, int input_size);
-__global__ void scan_summation(int * input, int * auxiliry_array, int input_size);
-
-#endif // !CUDA_COMMON_H
-
-//void query_device();
