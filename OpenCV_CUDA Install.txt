@@ -1,0 +1,16 @@
+How to install openCV, Visual Studio, and CUDA. Then combine them-
+
+1. Install OpenCV:
+Link: https://opencv.org/get-started/
+2. Install in C drive
+3. Link the bin folder in the environment "system variable" path
+ex: C:\opencv\build\x64\vc16\bin
+4. Open a visual studio project
+5. Go to the Properties of the project
+6. Go to C/C++ general, in additional include directories add the include folder
+ex: C:\opencv\build\include 
+8. Go to the linker and hit additional library directories add
+ex: C:\opencv\build\x64\vc16\lib
+9. Go to Linker and hit enter, write the file name
+ex: opencv_world490d.lib
+***Very important: for debug mode use 'd' after file name and for release don't add 'd'.
