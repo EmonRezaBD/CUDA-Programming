@@ -50,7 +50,7 @@ void SML();
 void printMat(cv::Mat img)
 {
     std::ofstream file;
-    file.open("D:\\CUDA_WLI\\SFF\\SFF_CUDA\\Result\\GPUImage.csv");
+    file.open("D:\\CUDA_WLI\\SFF\\SFF_CUDA\\Result\\GPUImage8.csv");
 
     if (!file.is_open()) {
         std::cerr << "Failed to open the file!" << std::endl;
@@ -171,13 +171,26 @@ void SML()
     width = cpuImgStack[0].cols;
 
     //Single Pointer Start
-    cv::cuda::GpuMat* horizontalFilteredImg = new cv::cuda::GpuMat[IMG_SIZE]; //uchar
+    //cv::cuda::GpuMat* horizontalFilteredImg = new cv::cuda::GpuMat[IMG_SIZE]; //uchar
+    cv::cuda::GpuMat horizontalFilteredImg[IMG_SIZE];
+
     for (int i = 0; i < IMG_SIZE; i++) {
         horizontalFilteredImg[i] = cv::cuda::GpuMat(height, width, CV_64F); //initializing as double
     }
 
     dim3 block(16, 16);
     dim3 grid((width + block.x - 1) / block.x, (height + block.y - 1) / block.y);
+
+    // //Calling kernel
+    for (int i = 0; i < IMG_SIZE; i++) {
+        convolution_Horizonatal_Kernel << <grid, block >> > (gpuImgStack[i].ptr<double>(), horizontalFilteredImg[i].ptr<double>(), width, height);
+        cudaDeviceSynchronize();
+    }
+    
+    cv::Mat hostResult;
+    horizontalFilteredImg[8].download(hostResult);
+
+    printMat(hostResult);
 
 
    // //Horizontal Kernel Start Working Code Double Pointer
@@ -423,7 +436,7 @@ __global__ void conv_img_gpu_stack(cv::cuda::PtrStepSz<float> imgGPUStack[], cv:
     if (tid < K2)
         sdata[tid] = kernel.data[tid];
 
-    __syncthreads(); //No error, just a warning
+    //__syncthreads(); //No error, just a warning
 
     if (idx < Nx * Ny)
     {
