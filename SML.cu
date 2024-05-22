@@ -22,7 +22,7 @@
 
 
 //Paths 
-#define IMG_SIZE 10 //Change
+#define IMG_SIZE 162 //Change
 #define IMG_READ_PATH "D:\\CUDA_WLI\\SFF\\IntensityModeMasum\\SFF_Masum\\UTAC_Data\\"
 
 //CPU Global vectors
@@ -50,7 +50,7 @@ void SML();
 void printMat(cv::Mat img)
 {
     std::ofstream file;
-    file.open("D:\\CUDA_WLI\\SFF\\SFF_CUDA\\Result\\GPUImage8.csv");
+    file.open("D:\\CUDA_WLI\\SFF\\SFF_CUDA\\Result\\GPUImg11.csv");
 
     if (!file.is_open()) {
         std::cerr << "Failed to open the file!" << std::endl;
@@ -71,24 +71,24 @@ void printMat(cv::Mat img)
     std::cout << "Image data written to CSV file successfully." << std::endl;
 }
 
-void testCode()
-{
-    std::string str = "D:\\CUDA_WLI\\SFF\\Data\\a1\\";
-    cv::Mat demo = cv::imread(str + "a1_75.BMP");
-    cv::Mat gray;
-    cv::cvtColor(demo, gray, cv::COLOR_BGR2GRAY);
-    cv::Mat bit32;
-    gray.convertTo(bit32, CV_32FC1);
-
-    printMat(bit32);
-
-    cv::cuda::GpuMat gpuImg;
-    gpuImg.upload(bit32);
-
-    cv::Mat dImg;
-    gpuImg.download(dImg);
-    printMat(dImg);
-}
+//void testCode()
+//{
+//    std::string str = "D:\\CUDA_WLI\\SFF\\Data\\a1\\";
+//    cv::Mat demo = cv::imread(str + "a1_75.BMP");
+//    cv::Mat gray;
+//    cv::cvtColor(demo, gray, cv::COLOR_BGR2GRAY);
+//    cv::Mat bit32;
+//    gray.convertTo(bit32, CV_32FC1);
+//
+//    printMat(bit32);
+//
+//    cv::cuda::GpuMat gpuImg;
+//    gpuImg.upload(bit32);
+//
+//    cv::Mat dImg;
+//    gpuImg.download(dImg);
+//    printMat(dImg);
+//}
 
 void gpuTocpu(cv::cuda::GpuMat& img)
 {
@@ -99,7 +99,7 @@ void gpuTocpu(cv::cuda::GpuMat& img)
     printMat(test);
 }
 
-__global__ void convolution_Vertical_Kernel(double** inputImg, double** convolutedImg, int imgWidth, int imgHeight, int imgIndex)
+__global__ void convolution_Kernel(double* inputImg, double* convolutedImg, int imgWidth, int imgHeight)
 {
     int col = blockIdx.x * blockDim.x + threadIdx.x;
     int row = blockIdx.y * blockDim.y + threadIdx.y;
@@ -107,90 +107,159 @@ __global__ void convolution_Vertical_Kernel(double** inputImg, double** convolut
     if (row < 2 || col < 2 || row >= imgHeight - 3 || col >= imgWidth - 3)
         return;
 
-    double kernel_v[3][3] = { 0 ,-1 ,0,
-                    0 ,-2 ,0 ,
-                    0 , -1 , 0 };
+    double kernel_h[3][3] = { -1.0 , 2.0 , -1.0 ,
+                             0.0 , 0.0 , 0.0 ,
+                               0.0 , 0.0 , 0.0 };
 
-    double sum = 0;
-    for (int j = -1; j <= 1; j++) {
-        for (int i = -1; i <= 1; i++) {
-            double color = inputImg[imgIndex][(row + j) * imgWidth + (col + i)];
-            sum += color * kernel_v[j + 1][i + 1];
+    double kernel_v[3][3] = { 0.0 ,-1.0 ,0.0,
+                              0.0 ,2.0 ,0.0 ,
+                              0.0 , -1.0 , 0.0 };
+
+    double sumX = 0.0, sumY = 0.0, color=0.0;
+    for (int i = -1; i <= 1; i++) {
+        for (int j = -1; j <= 1; j++) {
+            color = inputImg[(row + j) * imgWidth + (col + i)];
+            sumX += color * kernel_h[i + 1][j + 1];
+            sumY += color * kernel_v[i + 1][j + 1];
         }
     }
-    convolutedImg[imgIndex][row * imgWidth + col] = sum;
-}
+    
+    double sum = 0.0;
+    sum = std::abs(sumX) + std::abs(sumY);
+    if (sum > 255) sum = 255;
+    if (sum < 0) sum = 0;
 
-//__global__ void convolution_Horizonatal_Kernel(double** inputImg, double** convolutedImg, int imgWidth, int imgHeight, int imgIndex)
-//{
-//    int col = blockIdx.x * blockDim.x + threadIdx.x;
-//    int row = blockIdx.y * blockDim.y + threadIdx.y;
-//
-//    if (row < 2 || col < 2 || row >= imgHeight - 3 || col >= imgWidth - 3)
-//        return;
-//
-//    double kernel_h[3][3] = { -1 , 2 , -1 ,
-//                             0 , 0 , 0 ,
-//                               0 , 0 , 0 };
-//
-//    double sum = 0;
-//    for (int j = -1; j <= 1; j++) {
-//        for (int i = -1; i <= 1; i++) {
-//            double color = inputImg[imgIndex][(row + j) * imgWidth + (col + i)];
-//            sum += color * kernel_h[j + 1][i + 1];
-//        }
-//    }
-//    convolutedImg[imgIndex][row * imgWidth + col] = sum;
-//}
-
-__global__ void convolution_Horizonatal_Kernel(double* inputImg, double* convolutedImg, int imgWidth, int imgHeight)
-{
-    int col = blockIdx.x * blockDim.x + threadIdx.x;
-    int row = blockIdx.y * blockDim.y + threadIdx.y;
-
-    if (row < 2 || col < 2 || row >= imgHeight - 3 || col >= imgWidth - 3)
-        return;
-
-    double kernel_h[3][3] = { -1 , 2 , -1 ,
-                             0 , 0 , 0 ,
-                               0 , 0 , 0 };
-
-    double sum = 0;
-    for (int j = -1; j <= 1; j++) {
-        for (int i = -1; i <= 1; i++) {
-            double color = inputImg[(row + j) * imgWidth + (col + i)];
-            sum += color * kernel_h[j + 1][i + 1];
-        }
-    }
     convolutedImg[row * imgWidth + col] = sum;
 }
+
+__global__ void Sum_Mask_kernel(double* inputImg, double* convolutedImg, int imgWidth, int imgHeight)
+{
+    int col = blockIdx.x * blockDim.x + threadIdx.x;
+    int row = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (row < 2 || col < 2 || row >= imgHeight - 3 || col >= imgWidth - 3)
+        return;
+
+    double sum = 0.0, color = 0.0;
+    for (int j = -4; j <= 4; j++) { //9x9 kernel of 1's
+        for (int i = -4; i <= 4; i++) {
+            color = inputImg[(row + j) * imgWidth + (col + i)];
+            sum += color * 1.0;
+        }
+
+    }
+    
+    convolutedImg[row * imgWidth + col] = sum;
+   
+}
+
+__global__ void findMaxIndices(double** SML3, double* maxIndices, int imgWidth, int imgHeight, int size)
+{
+    printf("In Kernel\n");
+    double* dd = SML3[0];
+    printf("First val: %lf\n ", dd[0]);
+
+    int col = blockIdx.x * blockDim.x + threadIdx.x;
+    int row = blockIdx.y * blockDim.y + threadIdx.y;
+
+ 
+
+    if (row >= imgHeight || col >= imgWidth)
+        return;
+
+    double maxIntensity = -1.0;
+    int currentIndex = 0;
+    double intensity = 0.0;
+    for (int index = 0; index < size; index++) {
+        intensity = SML3[index][row * imgWidth + col];
+       // intensity = SML3[row * imgWidth + col];
+        //printf("%lf\n ", intensity);
+        if (intensity > maxIntensity) {
+            maxIntensity = intensity;
+            currentIndex = index;
+        }
+    }
+
+    maxIndices[row * imgWidth + col] = (double)(currentIndex);
+   
+}
+
 
 void SML()
 {
     height = cpuImgStack[0].rows;
     width = cpuImgStack[0].cols;
 
-    //Single Pointer Start
-    //cv::cuda::GpuMat* horizontalFilteredImg = new cv::cuda::GpuMat[IMG_SIZE]; //uchar
-    cv::cuda::GpuMat horizontalFilteredImg[IMG_SIZE];
+    clock_t cpu_start, cpu_end;
+    cpu_start = clock();
+
+    //For horizontal 
+    cv::cuda::GpuMat ML3[IMG_SIZE];
 
     for (int i = 0; i < IMG_SIZE; i++) {
-        horizontalFilteredImg[i] = cv::cuda::GpuMat(height, width, CV_64F); //initializing as double
+        ML3[i] = cv::cuda::GpuMat(height, width, CV_64F); //initializing as double
     }
 
-    dim3 block(16, 16);
-    dim3 grid((width + block.x - 1) / block.x, (height + block.y - 1) / block.y);
+    dim3 block(16, 16); //16*16 = 256
+    dim3 grid((width + block.x - 1) / block.x, (height + block.y - 1) / block.y); //80*64 = 5120. So, total threads 1,310,720. Thus, 1024*1280 = 1,310,720 pixels
 
-    // //Calling kernel
+    //Calling kernel
     for (int i = 0; i < IMG_SIZE; i++) {
-        convolution_Horizonatal_Kernel << <grid, block >> > (gpuImgStack[i].ptr<double>(), horizontalFilteredImg[i].ptr<double>(), width, height);
+        convolution_Kernel << <grid, block >> > (gpuImgStack[i].ptr<double>(), ML3[i].ptr<double>(), width, height);
+        cudaDeviceSynchronize();
+    }
+
+    cv::cuda::GpuMat SML3[IMG_SIZE];
+
+    for (int i = 0; i < IMG_SIZE; i++) {
+        SML3[i] = cv::cuda::GpuMat(height, width, CV_64F); //initializing as double
+    }
+
+    ////Calling kernel
+    for (int i = 0; i < IMG_SIZE; i++) {
+        Sum_Mask_kernel << <grid, block >> > (ML3[i].ptr<double>(), SML3[i].ptr<double>(), width, height);
         cudaDeviceSynchronize();
     }
     
-    cv::Mat hostResult;
-    horizontalFilteredImg[8].download(hostResult);
+   // ML3->release();
 
-    printMat(hostResult);
+
+   /*cpu_end = clock();
+   printf("Full Convo time : %4.6f \n",
+       (double)((double)(cpu_end - cpu_start) / CLOCKS_PER_SEC));*/
+
+   double** d_SML3;
+   cudaMalloc(&d_SML3, IMG_SIZE * sizeof(double*));
+
+   for (int i = 0; i < IMG_SIZE; i++) {
+       cudaMemcpy(&d_SML3[i], SML3[i].ptr<double>(), sizeof(double*), cudaMemcpyHostToDevice);
+   }
+
+   double* ptr = d_SML3[0];
+   printf("Ptr: %lf\n",ptr[0]);
+
+   cv::cuda::GpuMat maxIndices; //for storing max index values
+   maxIndices = cv::cuda::GpuMat(height, width, CV_64F);
+
+   findMaxIndices <<< grid, block >>> (d_SML3, maxIndices.ptr<double>(), width, height, IMG_SIZE);
+   cudaDeviceSynchronize();
+
+   gpuTocpu(maxIndices);
+   
+   //double* maxIndices = new double[height * width];
+   // Copy the results from the device to the host
+  // cudaMemcpy(maxIndices, d_maxIndices, height * width * sizeof(double), cudaMemcpyDeviceToHost);
+
+
+   // Free the device memory
+  // cudaFree(d_SML3);
+   //cudaFree(d_maxIndices);
+   //delete[] maxIndices;
+
+   // cv::Mat hostResult;
+   // horizontalFilteredImg[161].download(hostResult);
+
+   // printMat(hostResult);
 
     std::cout << "SML Complete\n" << std::endl;
 }
@@ -205,10 +274,10 @@ void readImage(std::string img_path)
             printf("Image read failed\n");
             exit(-1);
         }
-        // std::cout << i <<" IMG = " << i + 75 << std::endl;
+       // std::cout << i <<" IMG = " << i + 1 << std::endl;
     }
     
-    //std::cout << "Image Loading Done!" << std::endl;
+    std::cout << "Image Loading Done!" << std::endl;
     for (int i = 0; i < IMG_SIZE; i++)
     {
         cv::cvtColor(original_img_stack[i], GrayImage[i], cv::COLOR_BGR2GRAY);
@@ -221,7 +290,7 @@ void readImage(std::string img_path)
         }
     }
     //printMat(cpuImgStack[0]);
-    //gpuTocpu(gpuImgStack[0]);
+//    gpuTocpu(gpuImgStack[0]);
 }
 
 void readZPosition(std::string csv_path)
@@ -304,76 +373,47 @@ int main() //look at memory alloc and dealloc at the end
     return 0;
 }
 
-
-
-
-
-__global__ void findMaxIntensityIndexKernel(float** images, float* maxIndices, int width, int height, int imgSize, int step) 
-{
-    int x = blockIdx.x * blockDim.x + threadIdx.x;
-    int y = blockIdx.y * blockDim.y + threadIdx.y;
-     
-    if (x >= width || y >= height) return;
-
-    float maxIntensity = -FLT_MAX;
-    int maxIndex = 0;
-
-    for (int i = 0; i < imgSize; ++i) {
-        //float intensity = ((float*)((char*)images[i] + y * step))[x];
-        float intensity = ((float*)((float*)images[i] + y * step))[x];
-       // printf("pixel: %f", intensity);
-
-        if (intensity > maxIntensity) {
-            maxIntensity = intensity;
-            maxIndex = i;
-        } 
-    }
-
-    maxIndices[y * width + x] = maxIndex;
-   // printf("%f\n", maxIndices[y * width + x]);
-}
-
-//__global__ void conv_img_gpu_stack(cv::cuda::GpuMat imgGPUStack[], cv::cuda::GpuMat kernel, cv::cuda::GpuMat imgfGPUStack[], int Nx, int Ny, int N_images, int kernel_size)
-__global__ void conv_img_gpu_stack(cv::cuda::PtrStepSz<float> imgGPUStack[], cv::cuda::PtrStepSz<float> kernel, cv::cuda::PtrStepSz<float> imgfGPUStack[], int Nx, int Ny, int N_images, int kernel_size)
-{
-    //printf("%f",imgfGPUStack[0].cols);
-
-    int tid = threadIdx.x;
-    int iy = blockIdx.x + (kernel_size - 1) / 2;
-    int ix = threadIdx.x + (kernel_size - 1) / 2;
-    int imageIdx = blockIdx.y;
-    int idx = imageIdx * Nx * Ny + iy * Nx + ix;
-    int K2 = kernel_size * kernel_size;
-    int center = (kernel_size - 1) / 2;
-
-    int ii, jj;
-    float sum = 0.0;
-
-    extern __shared__ float sdata[];
-    if (tid < K2)
-        sdata[tid] = kernel.data[tid];
-
-    //__syncthreads(); //No error, just a warning
-
-    if (idx < Nx * Ny)
-    {
-        for (int ki = 0; ki < kernel_size; ki++)
-        {
-            for (int kj = 0; kj < kernel_size; kj++)
-            {
-                ii = kj + ix - center;
-                jj = ki + iy - center;
-
-                int pixelIdx = jj * imgGPUStack[imageIdx].step + ii;
-                float* pixelPtr = imgGPUStack[imageIdx].data + pixelIdx;
-                sum += *pixelPtr * sdata[ki * kernel_size + kj];
-
-            }
-        }
-        int outputPixelIdx = iy * imgfGPUStack[imageIdx].step + ix;
-        float* outputPixelPtr = imgfGPUStack[imageIdx].data + outputPixelIdx;
-        *outputPixelPtr = sum;
-    }
-
-}
+////__global__ void conv_img_gpu_stack(cv::cuda::GpuMat imgGPUStack[], cv::cuda::GpuMat kernel, cv::cuda::GpuMat imgfGPUStack[], int Nx, int Ny, int N_images, int kernel_size)
+//__global__ void conv_img_gpu_stack(cv::cuda::PtrStepSz<float> imgGPUStack[], cv::cuda::PtrStepSz<float> kernel, cv::cuda::PtrStepSz<float> imgfGPUStack[], int Nx, int Ny, int N_images, int kernel_size)
+//{
+//    //printf("%f",imgfGPUStack[0].cols);
+//
+//    int tid = threadIdx.x;
+//    int iy = blockIdx.x + (kernel_size - 1) / 2;
+//    int ix = threadIdx.x + (kernel_size - 1) / 2;
+//    int imageIdx = blockIdx.y;
+//    int idx = imageIdx * Nx * Ny + iy * Nx + ix;
+//    int K2 = kernel_size * kernel_size;
+//    int center = (kernel_size - 1) / 2;
+//
+//    int ii, jj;
+//    float sum = 0.0;
+//
+//    extern __shared__ float sdata[];
+//    if (tid < K2)
+//        sdata[tid] = kernel.data[tid];
+//
+//    //__syncthreads(); //No error, just a warning
+//
+//    if (idx < Nx * Ny)
+//    {
+//        for (int ki = 0; ki < kernel_size; ki++)
+//        {
+//            for (int kj = 0; kj < kernel_size; kj++)
+//            {
+//                ii = kj + ix - center;
+//                jj = ki + iy - center;
+//
+//                int pixelIdx = jj * imgGPUStack[imageIdx].step + ii;
+//                float* pixelPtr = imgGPUStack[imageIdx].data + pixelIdx;
+//                sum += *pixelPtr * sdata[ki * kernel_size + kj];
+//
+//            }
+//        }
+//        int outputPixelIdx = iy * imgfGPUStack[imageIdx].step + ix;
+//        float* outputPixelPtr = imgfGPUStack[imageIdx].data + outputPixelIdx;
+//        *outputPixelPtr = sum;
+//    }
+//
+//}
 
