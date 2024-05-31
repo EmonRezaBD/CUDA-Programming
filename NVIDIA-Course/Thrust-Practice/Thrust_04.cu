@@ -15,6 +15,7 @@ using namespace std;
 * This codes covered iterators
 * these are simple version
 * STL like 
+* Thrust also provides a collection of fancy iterators with names like counting_iteratorand zip_iterator.
 */
 
 int main()
