@@ -1,0 +1,122 @@
+﻿Build started 6/11/2024 3:18:32 PM.
+Logging verbosity is set to: Normal.     1>Project "D:\CUDA_WLI\SFF\SFF_CUDA_DLL\SFF_CUDA\SFF_CUDA.vcxproj" on node 2 (Rebuild target(s)).
+     1>_PrepareForClean:
+         Deleting file "x64\Debug\SFF_CUDA.tlog\SFF_CUDA.lastbuildstate".
+     1>Project "D:\CUDA_WLI\SFF\SFF_CUDA_DLL\SFF_CUDA\SFF_CUDA.vcxproj" (1) is building "D:\CUDA_WLI\SFF\SFF_CUDA_DLL\SFF_CUDA\SFF_CUDA.vcxproj" (1:2) on node 2 (CudaCleanCore target(s)).
+     1>CudaCleanCore:
+         Deleting file "x64\Debug\kernel.cu-1790293870.deps".
+     1>Done Building Project "D:\CUDA_WLI\SFF\SFF_CUDA_DLL\SFF_CUDA\SFF_CUDA.vcxproj" (CudaCleanCore target(s)).
+     1>InitializeBuildStatus:
+         Creating "x64\Debug\SFF_CUDA.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+       AddCudaCompileDeps:
+         C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\bin\HostX86\x64\cl.exe /E /nologo /showIncludes /TP /D__CUDACC__ /D__CUDACC_VER_MAJOR__=12 /D__CUDACC_VER_MINOR__=2 /DWIN32 /DWIN64 /D_DEBUG /D_CONSOLE /D_MBCS /ID:\opencvCUDA\build\install\include /IE:\InstalledApps\opencvCUDA\build\install\include /I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2\include" /I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2\bin" /I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2\include" /I. /FIcuda_runtime.h /c D:\CUDA_WLI\SFF\SFF_CUDA_DLL\SFF_CUDA\kernel.cu 
+     1>Project "D:\CUDA_WLI\SFF\SFF_CUDA_DLL\SFF_CUDA\SFF_CUDA.vcxproj" (1) is building "D:\CUDA_WLI\SFF\SFF_CUDA_DLL\SFF_CUDA\SFF_CUDA.vcxproj" (1:3) on node 2 (CudaBuildCore target(s)).
+     1>CudaBuildCore:
+         Compiling CUDA source file kernel.cu...
+         cmd.exe /C "D:\TEMP\Local\Temp\tmp7f0e7aaa6c8a45a4a299192def251d6e.cmd"
+         "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2\bin\nvcc.exe" -gencode=arch=compute_52,code=\"sm_52,compute_52\" --use-local-env -ccbin "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\bin\HostX86\x64" -x cu   -ID:\opencvCUDA\build\install\include -IE:\InstalledApps\opencvCUDA\build\install\include -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2\include"  -G   --keep-dir x64\Debug  -maxrregcount=0   --machine 64 --compile -cudart static  -g  -DWIN32 -DWIN64 -D_DEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /FS /Zi /RTC1 /MDd " -Xcompiler "/Fdx64\Debug\vc142.pdb" -o D:\CUDA_WLI\SFF\SFF_CUDA_DLL\SFF_CUDA\x64\Debug\kernel.cu.obj "D:\CUDA_WLI\SFF\SFF_CUDA_DLL\SFF_CUDA\kernel.cu"
+         
+         D:\CUDA_WLI\SFF\SFF_CUDA_DLL\SFF_CUDA>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2\bin\nvcc.exe" -gencode=arch=compute_52,code=\"sm_52,compute_52\" --use-local-env -ccbin "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\bin\HostX86\x64" -x cu   -ID:\opencvCUDA\build\install\include -IE:\InstalledApps\opencvCUDA\build\install\include -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2\include"  -G   --keep-dir x64\Debug  -maxrregcount=0   --machine 64 --compile -cudart static  -g  -DWIN32 -DWIN64 -D_DEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /FS /Zi /RTC1 /MDd " -Xcompiler "/Fdx64\Debug\vc142.pdb" -o D:\CUDA_WLI\SFF\SFF_CUDA_DLL\SFF_CUDA\x64\Debug\kernel.cu.obj "D:\CUDA_WLI\SFF\SFF_CUDA_DLL\SFF_CUDA\kernel.cu" 
+     1>D:\opencvCUDA\build\install\include\opencv2/stitching/detail/warpers.hpp(235): warning #611-D: overloaded virtual function "cv::detail::PlaneWarper::buildMaps" is only partially overridden in class "cv::detail::AffineWarper"
+           class  AffineWarper : public PlaneWarper
+                  ^
+         
+         Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+         
+     1>D:\opencvCUDA\build\install\include\opencv2/stitching/detail/warpers.hpp(235): warning #611-D: overloaded virtual function "cv::detail::PlaneWarper::warp" is only partially overridden in class "cv::detail::AffineWarper"
+           class  AffineWarper : public PlaneWarper
+                  ^
+         
+     1>D:\opencvCUDA\build\install\include\opencv2/stitching/detail/matchers.hpp(182): warning #611-D: overloaded virtual function "cv::detail::FeaturesMatcher::match" is only partially overridden in class "cv::detail::BestOf2NearestMatcher"
+           class  BestOf2NearestMatcher : public FeaturesMatcher
+                  ^
+         
+     1>D:\opencvCUDA\build\install\include\opencv2/stitching/detail/matchers.hpp(236): warning #611-D: overloaded virtual function "cv::detail::FeaturesMatcher::match" is only partially overridden in class "cv::detail::AffineBestOf2NearestMatcher"
+           class  AffineBestOf2NearestMatcher : public BestOf2NearestMatcher
+                  ^
+         
+     1>D:\opencvCUDA\build\install\include\opencv2/stitching/detail/blenders.hpp(100): warning #611-D: overloaded virtual function "cv::detail::Blender::prepare" is only partially overridden in class "cv::detail::FeatherBlender"
+           class  FeatherBlender : public Blender
+                  ^
+         
+     1>D:\opencvCUDA\build\install\include\opencv2/stitching/detail/blenders.hpp(127): warning #611-D: overloaded virtual function "cv::detail::Blender::prepare" is only partially overridden in class "cv::detail::MultiBandBlender"
+           class  MultiBandBlender : public Blender
+                  ^
+         
+     1>D:\opencvCUDA\build\install\include\opencv2/stitching/detail/warpers.hpp(235): warning #611-D: overloaded virtual function "cv::detail::PlaneWarper::buildMaps" is only partially overridden in class "cv::detail::AffineWarper"
+           class  AffineWarper : public PlaneWarper
+                  ^
+         
+         Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+         
+     1>D:\opencvCUDA\build\install\include\opencv2/stitching/detail/warpers.hpp(235): warning #611-D: overloaded virtual function "cv::detail::PlaneWarper::warp" is only partially overridden in class "cv::detail::AffineWarper"
+           class  AffineWarper : public PlaneWarper
+                  ^
+         
+     1>D:\opencvCUDA\build\install\include\opencv2/stitching/detail/matchers.hpp(182): warning #611-D: overloaded virtual function "cv::detail::FeaturesMatcher::match" is only partially overridden in class "cv::detail::BestOf2NearestMatcher"
+           class  BestOf2NearestMatcher : public FeaturesMatcher
+                  ^
+         
+     1>D:\opencvCUDA\build\install\include\opencv2/stitching/detail/matchers.hpp(236): warning #611-D: overloaded virtual function "cv::detail::FeaturesMatcher::match" is only partially overridden in class "cv::detail::AffineBestOf2NearestMatcher"
+           class  AffineBestOf2NearestMatcher : public BestOf2NearestMatcher
+                  ^
+         
+     1>D:\opencvCUDA\build\install\include\opencv2/stitching/detail/blenders.hpp(100): warning #611-D: overloaded virtual function "cv::detail::Blender::prepare" is only partially overridden in class "cv::detail::FeatherBlender"
+           class  FeatherBlender : public Blender
+                  ^
+         
+     1>D:\opencvCUDA\build\install\include\opencv2/stitching/detail/blenders.hpp(127): warning #611-D: overloaded virtual function "cv::detail::Blender::prepare" is only partially overridden in class "cv::detail::MultiBandBlender"
+           class  MultiBandBlender : public Blender
+                  ^
+         
+     1>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2\include\thrust/system/cuda/detail/get_value.h(63): warning #20011-D: calling a __host__ function("std::_Iterator_base12::_Iterator_base12(const ::std::_Iterator_base12&)") from a __host__ __device__ function("std::_Iterator_base12::_Iterator_base12 [subobject]") is not allowed
+         
+     1>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2\include\thrust/system/cuda/detail/get_value.h(63): warning #20011-D: calling a __host__ function("std::_Iterator_base12::~_Iterator_base12()") from a __host__ __device__ function("std::_Iterator_base12::~_Iterator_base12 [subobject]") is not allowed
+         
+         kernel.cu
+         tmpxft_000067e8_00000000-7_kernel.cudafe1.cpp
+     1>D:\CUDA_WLI\SFF\SFF_CUDA_DLL\SFF_CUDA\kernel.cu(262): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+     1>Done Building Project "D:\CUDA_WLI\SFF\SFF_CUDA_DLL\SFF_CUDA\SFF_CUDA.vcxproj" (CudaBuildCore target(s)).
+     1>Link:
+         C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\bin\HostX86\x64\link.exe /ERRORREPORT:PROMPT /OUT:"D:\CUDA_WLI\SFF\SFF_CUDA_DLL\x64\Debug\SFF_CUDA.exe" /INCREMENTAL /ILK:"x64\Debug\SFF_CUDA.ilk" /NOLOGO /LIBPATH:D:\opencvCUDA\build\install\x64\vc16\lib /LIBPATH:"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2\lib\x64" cudart_static.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib opencv_world490d.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib cudart.lib cudadevrt.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:\CUDA_WLI\SFF\SFF_CUDA_DLL\x64\Debug\SFF_CUDA.pdb" /SUBSYSTEM:CONSOLE /LTCG:incremental /LTCGOUT:"x64\Debug\SFF_CUDA.iobj" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\CUDA_WLI\SFF\SFF_CUDA_DLL\x64\Debug\SFF_CUDA.lib" /MACHINE:X64 D:\CUDA_WLI\SFF\SFF_CUDA_DLL\SFF_CUDA\x64\Debug\kernel.cu.obj
+     1>LINK : warning LNK4075: ignoring '/INCREMENTAL' due to '/LTCG' specification
+            Creating library D:\CUDA_WLI\SFF\SFF_CUDA_DLL\x64\Debug\SFF_CUDA.lib and object D:\CUDA_WLI\SFF\SFF_CUDA_DLL\x64\Debug\SFF_CUDA.exp
+     1>LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
+         LINK : /LTCG specified but no code generation required; remove /LTCG from the link command line to improve linker performance
+         SFF_CUDA.vcxproj -> D:\CUDA_WLI\SFF\SFF_CUDA_DLL\x64\Debug\SFF_CUDA.exe
+       FinalizeBuildStatus:
+         Deleting file "x64\Debug\SFF_CUDA.tlog\unsuccessfulbuild".
+         Touching "x64\Debug\SFF_CUDA.tlog\SFF_CUDA.lastbuildstate".
+     1>Done Building Project "D:\CUDA_WLI\SFF\SFF_CUDA_DLL\SFF_CUDA\SFF_CUDA.vcxproj" (Rebuild target(s)).
+
+Build succeeded.
+
+       "D:\CUDA_WLI\SFF\SFF_CUDA_DLL\SFF_CUDA\SFF_CUDA.vcxproj" (Rebuild target) (1) ->
+       "D:\CUDA_WLI\SFF\SFF_CUDA_DLL\SFF_CUDA\SFF_CUDA.vcxproj" (CudaBuildCore target) (1:3) ->
+       (CudaBuildCore target) -> 
+         D:\opencvCUDA\build\install\include\opencv2/stitching/detail/warpers.hpp(235): warning #611-D: overloaded virtual function "cv::detail::PlaneWarper::buildMaps" is only partially overridden in class "cv::detail::AffineWarper"
+         D:\opencvCUDA\build\install\include\opencv2/stitching/detail/warpers.hpp(235): warning #611-D: overloaded virtual function "cv::detail::PlaneWarper::warp" is only partially overridden in class "cv::detail::AffineWarper"
+         D:\opencvCUDA\build\install\include\opencv2/stitching/detail/matchers.hpp(182): warning #611-D: overloaded virtual function "cv::detail::FeaturesMatcher::match" is only partially overridden in class "cv::detail::BestOf2NearestMatcher"
+         D:\opencvCUDA\build\install\include\opencv2/stitching/detail/matchers.hpp(236): warning #611-D: overloaded virtual function "cv::detail::FeaturesMatcher::match" is only partially overridden in class "cv::detail::AffineBestOf2NearestMatcher"
+         D:\opencvCUDA\build\install\include\opencv2/stitching/detail/blenders.hpp(100): warning #611-D: overloaded virtual function "cv::detail::Blender::prepare" is only partially overridden in class "cv::detail::FeatherBlender"
+         D:\opencvCUDA\build\install\include\opencv2/stitching/detail/blenders.hpp(127): warning #611-D: overloaded virtual function "cv::detail::Blender::prepare" is only partially overridden in class "cv::detail::MultiBandBlender"
+         D:\opencvCUDA\build\install\include\opencv2/stitching/detail/warpers.hpp(235): warning #611-D: overloaded virtual function "cv::detail::PlaneWarper::buildMaps" is only partially overridden in class "cv::detail::AffineWarper"
+         D:\opencvCUDA\build\install\include\opencv2/stitching/detail/warpers.hpp(235): warning #611-D: overloaded virtual function "cv::detail::PlaneWarper::warp" is only partially overridden in class "cv::detail::AffineWarper"
+         D:\opencvCUDA\build\install\include\opencv2/stitching/detail/matchers.hpp(182): warning #611-D: overloaded virtual function "cv::detail::FeaturesMatcher::match" is only partially overridden in class "cv::detail::BestOf2NearestMatcher"
+         D:\opencvCUDA\build\install\include\opencv2/stitching/detail/matchers.hpp(236): warning #611-D: overloaded virtual function "cv::detail::FeaturesMatcher::match" is only partially overridden in class "cv::detail::AffineBestOf2NearestMatcher"
+         D:\opencvCUDA\build\install\include\opencv2/stitching/detail/blenders.hpp(100): warning #611-D: overloaded virtual function "cv::detail::Blender::prepare" is only partially overridden in class "cv::detail::FeatherBlender"
+         D:\opencvCUDA\build\install\include\opencv2/stitching/detail/blenders.hpp(127): warning #611-D: overloaded virtual function "cv::detail::Blender::prepare" is only partially overridden in class "cv::detail::MultiBandBlender"
+         C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2\include\thrust/system/cuda/detail/get_value.h(63): warning #20011-D: calling a __host__ function("std::_Iterator_base12::_Iterator_base12(const ::std::_Iterator_base12&)") from a __host__ __device__ function("std::_Iterator_base12::_Iterator_base12 [subobject]") is not allowed
+         C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2\include\thrust/system/cuda/detail/get_value.h(63): warning #20011-D: calling a __host__ function("std::_Iterator_base12::~_Iterator_base12()") from a __host__ __device__ function("std::_Iterator_base12::~_Iterator_base12 [subobject]") is not allowed
+         D:\CUDA_WLI\SFF\SFF_CUDA_DLL\SFF_CUDA\kernel.cu(262): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+
+
+       "D:\CUDA_WLI\SFF\SFF_CUDA_DLL\SFF_CUDA\SFF_CUDA.vcxproj" (Rebuild target) (1) ->
+       (Link target) -> 
+         LINK : warning LNK4075: ignoring '/INCREMENTAL' due to '/LTCG' specification
+         LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
+
+    17 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:05.57
