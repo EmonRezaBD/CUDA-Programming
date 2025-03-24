@@ -1,0 +1,120 @@
+﻿  Compiling CUDA source file kernel.cu...
+  
+  E:\Interferometry\PSOAlgoCUDA\PSOAlgoCUDA>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.6\bin\nvcc.exe" -gencode=arch=compute_52,code=\"sm_52,compute_52\" --use-local-env -ccbin "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.43.34808\bin\HostX64\x64" -x cu   -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.6\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.6\include"  -G   --keep-dir x64\Debug  -maxrregcount=0   --machine 64 --compile -cudart static  -g  -DWIN32 -DWIN64 -D_DEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /FS /Zi /RTC1 /MDd " -Xcompiler "/Fdx64\Debug\vc143.pdb" -o E:\Interferometry\PSOAlgoCUDA\PSOAlgoCUDA\x64\Debug\kernel.cu.obj "E:\Interferometry\PSOAlgoCUDA\PSOAlgoCUDA\kernel.cu" 
+C:\openCVCUDA\include\opencv2/stitching/detail/warpers.hpp(235): warning #611-D: overloaded virtual function "cv::detail::PlaneWarper::buildMaps" is only partially overridden in class "cv::detail::AffineWarper"
+    class  AffineWarper : public PlaneWarper
+           ^
+  
+  Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+  
+C:\openCVCUDA\include\opencv2/stitching/detail/warpers.hpp(235): warning #611-D: overloaded virtual function "cv::detail::PlaneWarper::warp" is only partially overridden in class "cv::detail::AffineWarper"
+    class  AffineWarper : public PlaneWarper
+           ^
+  
+C:\openCVCUDA\include\opencv2/stitching/detail/matchers.hpp(182): warning #611-D: overloaded virtual function "cv::detail::FeaturesMatcher::match" is only partially overridden in class "cv::detail::BestOf2NearestMatcher"
+    class  BestOf2NearestMatcher : public FeaturesMatcher
+           ^
+  
+C:\openCVCUDA\include\opencv2/stitching/detail/matchers.hpp(236): warning #611-D: overloaded virtual function "cv::detail::FeaturesMatcher::match" is only partially overridden in class "cv::detail::AffineBestOf2NearestMatcher"
+    class  AffineBestOf2NearestMatcher : public BestOf2NearestMatcher
+           ^
+  
+C:\openCVCUDA\include\opencv2/stitching/detail/blenders.hpp(100): warning #611-D: overloaded virtual function "cv::detail::Blender::prepare" is only partially overridden in class "cv::detail::FeatherBlender"
+    class  FeatherBlender : public Blender
+           ^
+  
+C:\openCVCUDA\include\opencv2/stitching/detail/blenders.hpp(127): warning #611-D: overloaded virtual function "cv::detail::Blender::prepare" is only partially overridden in class "cv::detail::MultiBandBlender"
+    class  MultiBandBlender : public Blender
+           ^
+  
+E:\Interferometry\PSOAlgoCUDA\PSOAlgoCUDA\kernel.cu(155): warning #940-D: missing return statement at end of non-void function "InitCalc"
+    }
+    ^
+  
+E:\Interferometry\PSOAlgoCUDA\PSOAlgoCUDA\kernel.cu(218): warning #940-D: missing return statement at end of non-void function "Get"
+    }
+    ^
+  
+C:\openCVCUDA\include\opencv2/stitching/detail/warpers.hpp(235): warning #611-D: overloaded virtual function "cv::detail::PlaneWarper::buildMaps" is only partially overridden in class "cv::detail::AffineWarper"
+    class  AffineWarper : public PlaneWarper
+           ^
+  
+  Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+  
+C:\openCVCUDA\include\opencv2/stitching/detail/warpers.hpp(235): warning #611-D: overloaded virtual function "cv::detail::PlaneWarper::warp" is only partially overridden in class "cv::detail::AffineWarper"
+    class  AffineWarper : public PlaneWarper
+           ^
+  
+C:\openCVCUDA\include\opencv2/stitching/detail/matchers.hpp(182): warning #611-D: overloaded virtual function "cv::detail::FeaturesMatcher::match" is only partially overridden in class "cv::detail::BestOf2NearestMatcher"
+    class  BestOf2NearestMatcher : public FeaturesMatcher
+           ^
+  
+C:\openCVCUDA\include\opencv2/stitching/detail/matchers.hpp(236): warning #611-D: overloaded virtual function "cv::detail::FeaturesMatcher::match" is only partially overridden in class "cv::detail::AffineBestOf2NearestMatcher"
+    class  AffineBestOf2NearestMatcher : public BestOf2NearestMatcher
+           ^
+  
+C:\openCVCUDA\include\opencv2/stitching/detail/blenders.hpp(100): warning #611-D: overloaded virtual function "cv::detail::Blender::prepare" is only partially overridden in class "cv::detail::FeatherBlender"
+    class  FeatherBlender : public Blender
+           ^
+  
+C:\openCVCUDA\include\opencv2/stitching/detail/blenders.hpp(127): warning #611-D: overloaded virtual function "cv::detail::Blender::prepare" is only partially overridden in class "cv::detail::MultiBandBlender"
+    class  MultiBandBlender : public Blender
+           ^
+  
+E:\Interferometry\PSOAlgoCUDA\PSOAlgoCUDA\kernel.cu(155): warning #940-D: missing return statement at end of non-void function "InitCalc"
+    }
+    ^
+  
+E:\Interferometry\PSOAlgoCUDA\PSOAlgoCUDA\kernel.cu(131): warning #177-D: variable "F" was declared but never referenced
+        SFrng F;
+              ^
+  
+E:\Interferometry\PSOAlgoCUDA\PSOAlgoCUDA\kernel.cu(148): warning #177-D: variable "n1" was declared but never referenced
+        int n1 = 0, n2 = 0, n3 = 0, n4 = 0;
+            ^
+  
+E:\Interferometry\PSOAlgoCUDA\PSOAlgoCUDA\kernel.cu(148): warning #177-D: variable "n2" was declared but never referenced
+        int n1 = 0, n2 = 0, n3 = 0, n4 = 0;
+                    ^
+  
+E:\Interferometry\PSOAlgoCUDA\PSOAlgoCUDA\kernel.cu(148): warning #177-D: variable "n3" was declared but never referenced
+        int n1 = 0, n2 = 0, n3 = 0, n4 = 0;
+                            ^
+  
+E:\Interferometry\PSOAlgoCUDA\PSOAlgoCUDA\kernel.cu(148): warning #177-D: variable "n4" was declared but never referenced
+        int n1 = 0, n2 = 0, n3 = 0, n4 = 0;
+                                    ^
+  
+E:\Interferometry\PSOAlgoCUDA\PSOAlgoCUDA\kernel.cu(149): warning #177-D: variable "dh" was declared but never referenced
+        int dh = ht / 7, dw = wd / 7;
+            ^
+  
+E:\Interferometry\PSOAlgoCUDA\PSOAlgoCUDA\kernel.cu(149): warning #177-D: variable "dw" was declared but never referenced
+        int dh = ht / 7, dw = wd / 7;
+                         ^
+  
+E:\Interferometry\PSOAlgoCUDA\PSOAlgoCUDA\kernel.cu(150): warning #550-D: variable "R" was set but never used
+        SROI R;
+             ^
+  
+E:\Interferometry\PSOAlgoCUDA\PSOAlgoCUDA\kernel.cu(218): warning #940-D: missing return statement at end of non-void function "Get"
+    }
+    ^
+  
+E:\Interferometry\PSOAlgoCUDA\PSOAlgoCUDA\kernel.cu(163): warning #550-D: variable "result_ptr" was set but never used
+        float* result_ptr = nullptr;
+               ^
+  
+  kernel.cu
+  tmpxft_000056e8_00000000-7_kernel.cudafe1.cpp
+E:\Interferometry\PSOAlgoCUDA\PSOAlgoCUDA\kernel.cu(78): warning C4244: '=': conversion from '_Ty' to 'float', possible loss of data
+          with
+          [
+              _Ty=double
+          ]
+E:\Interferometry\PSOAlgoCUDA\PSOAlgoCUDA\kernel.cu(82): warning C4101: 'e': unreferenced local variable
+E:\Interferometry\PSOAlgoCUDA\PSOAlgoCUDA\kernel.cu(155): warning C4715: 'InitCalc': not all control paths return a value
+E:\Interferometry\PSOAlgoCUDA\PSOAlgoCUDA\kernel.cu(218): warning C4715: 'Get': not all control paths return a value
+     Creating library E:\Interferometry\PSOAlgoCUDA\x64\Debug\PSOAlgoCUDA.lib and object E:\Interferometry\PSOAlgoCUDA\x64\Debug\PSOAlgoCUDA.exp
+LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
+  PSOAlgoCUDA.vcxproj -> E:\Interferometry\PSOAlgoCUDA\x64\Debug\PSOAlgoCUDA.exe
