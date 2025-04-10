@@ -1,6 +1,6 @@
 ﻿#include "cuda_runtime.h"
 #include "device_launch_parameters.h"
-#include"PSOHeader.h"
+
 
 //For CPP
 #include <iostream>
@@ -18,54 +18,30 @@
 #include <opencv2/cudaarithm.hpp> //for abs
 #include <opencv2/imgcodecs.hpp>     // Image file reading and writing
 
-//For pointer in GPU
-#include<thrust/device_vector.h>
-#include <thrust/extrema.h>
-#include <thrust/reduce.h>
-#include <thrust/iterator/counting_iterator.h>
-#include <thrust/tuple.h>
-#include <thrust/functional.h>
-
-//Paths
-#define IMG_SIZE 415 //Change
-#define IMG_WRITE_PATH "E:\\Interferometry\\RAFT\\bump_img_wli_raft\\"
-#define IMG_READ_PATH "E:\\Interferometry\\RAFT\\bump_img_wli_raft\\"
-
 using namespace std;
 using namespace cv;
+using namespace cv::cuda;
 
-std::vector<double>zPos;
-std::vector < cv::cuda::GpuMat>gpuImgStack;
-cv::Mat original_img;
-std::vector<cv::Mat>GrayImage;
-std::vector<cv::Mat>cpuImgStack;
+#define PI 3.14159265358979323846f
+#define LAMBDA_EQUIV 2.64f  // Equivalent wavelength in micrometers
 
-//Background image
-cv::Mat tempImBG_;
-cv::cuda::GpuMat ImBG_;
+// Load grayscale stack and Z-positions
+bool loadStackAndZ(const string& dir, int numImages, vector<GpuMat>& gpuStack, vector<float>& zValues) {
+    gpuStack.clear();
+    zValues.clear();
 
-
-//Note: 
-//Start from minMax function 
-
-//Read Z position
-void readZPosition(std::string csv_path)
-{
-
-    SAmp sAmp;
-    string path = csv_path + "bump_img_wli_raft.CSV";
-
-    std::ifstream file(path);  // Open the CSV file
+    // Load Z values from CSV
+    ifstream file(dir + "/bump_img_wli_raft.CSV");
     if (!file.is_open()) {
         //std::cerr << "Error opening file!" << std::endl;
-        return;
+        return false;
     }
     int cnt = 0;
 
     std::vector<double> columnData;  // Vector to store 2nd column values
     std::string line;
 
-     //Read the CSV file line by line
+    //Read the CSV file line by line
     while (std::getline(file, line)) {
         std::stringstream ss(line);
         std::string cell;
@@ -76,8 +52,9 @@ void readZPosition(std::string csv_path)
             if (colIndex == 1) {  // 2nd column (0-based index)
                 try {
                     columnData.push_back(std::stod(cell));  // Convert to double and store
-                    sAmp.PzPos_um = columnData[cnt];
-                    ImgInfo.push_back(sAmp);
+                    zValues.push_back(std::stod(cell));
+                    /*sAmp.PzPos_um = columnData[cnt];
+                    ImgInfo.push_back(sAmp);*/
                     cnt++;
                 }
                 catch (const std::exception& e) {
@@ -89,143 +66,155 @@ void readZPosition(std::string csv_path)
     }
 
     file.close();
-}
 
-//Read images
-void readImage(std::string img_path) //conversion and uploading to GPU
-{
-    //Clearing memory
-    gpuImgStack.clear();
+    if (zValues.size() != numImages) return false;
 
-    cv::cuda::GpuMat gpuTempImg;
-    for (int i = 0; i < IMG_SIZE; i++)
-    {
-        original_img = cv::imread(img_path + "bump_img_wli_raft_" + std::to_string(i + 1) + ".BMP");
-        if (original_img.empty())
-        {
-            printf("Image read failed\n");
-            exit(-1);
-        }
-        gpuTempImg.upload(original_img);
-        gpuImgStack.push_back(gpuTempImg);
+    // Load grayscale images to GPU
+    for (int i = 1; i <= numImages; ++i) {
+        stringstream path;
+        path << dir << "bump_img_wli_raft_" << i << ".BMP";
+        Mat img = imread(path.str(), IMREAD_COLOR);
+        if (img.empty()) return false;
 
-       // gpuImgStack[i].cv::cuda::GpuMat::convertTo(gpuImgStack[i], -1, 1, -155);
-      //  gpuImgStack[i].cv::cuda::GpuMat::convertTo(gpuImgStack[i], -1, 3.6, 0);
-
-       // cv::cuda::cvtColor(gpuImgStack[i], gpuImgStack[i], cv::COLOR_BGR2GRAY);
-       // gpuImgStack[i].cv::cuda::GpuMat::convertTo(gpuImgStack[i], CV_64F);
-
+        Mat gray;
+        cv::cvtColor(img, gray, COLOR_BGR2GRAY);
+        GpuMat gGray;
+        gGray.upload(gray);
+        gpuStack.push_back(gGray);
     }
 
-    std::cout << "Image UpLoading Done!" << std::endl;
-
+    return true;
 }
 
-//Init Calculation
+// CUDA Kernel: compute phase per pixel
+__global__ void computePhaseKernel(const uchar** images, const float* sinPhi, const float* cosPhi,
+    float* phaseOut, int width, int height, int numFrames, size_t step) {
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+    int y = blockIdx.y * blockDim.y + threadIdx.y;
+    if (x >= width || y >= height) return;
 
-void GetDim(int& x, int& y, int& b) {
-    x = gpuImgStack[0].cols; y = gpuImgStack[0].rows; b = 24;
-}
-
-bool InitCalc()
-{
-    SFrng F;
-
-    nSteps = int(gpuImgStack.size());
-    if (nSteps < 1) return false;
-    zRange_um = ImgInfo[nSteps - 1].PzPos_um - ImgInfo[0].PzPos_um;
-    UStep_um = zRange_um / nSteps;
-
-    tempImBG_ = cv::imread("E:\\Interferometry\\RAFT\\bump_img_wli_raft\\eeee.BMP");
-    ImBG_.upload(tempImBG_);
-
-    GetDim(wd, ht, bpp);
-
-    int Ch1 = REDA, Ch2 = GRNA, Ch3 = BLUA, Ch4 = WHTA;
-
-    wlen_um[Ch1] = 0; wlen_um[Ch2] = 0;
-    wlen_um[Ch3] = 0; wlen_um[Ch4] = 0;
-
-    int n1 = 0, n2 = 0, n3 = 0, n4 = 0;
-    int dh = ht / 7, dw = wd / 7;
-    SROI R;
-    R.i2 = nSteps;
-
-
-
-}
-
-float* Get(FRP Ch, int ist, int sz)
-{
-    if (sz < 1) {
-        return nullptr;
+    float sumSin = 0.0f;
+    float sumCos = 0.0f;
+    for (int i = 0; i < numFrames; ++i) {
+        const uchar* img = images[i];
+        int idx = y * step + x;
+        float intensity = static_cast<float>(img[idx]);
+        sumSin += intensity * sinPhi[i];
+        sumCos += intensity * cosPhi[i];
     }
-    // Pointer to store result
-    float* result_ptr = nullptr;
 
-    switch (Ch)
-    {
-    case ZAXS:
-        if (Sz[Ch] != sz) {
-            Sz[Ch] = sz;
-            zaxs_d.resize(sz);
-        }
-        // Get raw pointer to device memory
-        result_ptr = thrust::raw_pointer_cast(zaxs_d.data() + ist);
-        break;
-
-    case REDA:
-        if (Sz[Ch] != sz) {
-            Sz[Ch] = sz;
-            reda_d.resize(sz);
-        }
-        result_ptr = thrust::raw_pointer_cast(reda_d.data() + ist);
-        break;
-
-    case GRNA:
-        if (Sz[Ch] != sz) {
-            Sz[Ch] = sz;
-            grna_d.resize(sz);
-        }
-        result_ptr = thrust::raw_pointer_cast(grna_d.data() + ist);
-        break;
-
-    case BLUA:
-        if (Sz[Ch] != sz) {
-            Sz[Ch] = sz;
-            blua_d.resize(sz);
-        }
-        result_ptr = thrust::raw_pointer_cast(blua_d.data() + ist);
-        break;
-
-    case WHTA:
-        if (Sz[Ch] != sz) {
-            Sz[Ch] = sz;
-            whta_d.resize(sz);
-        }
-        result_ptr = thrust::raw_pointer_cast(whta_d.data() + ist);
-        break;
-
-    case TMP1:
-        if (Sz[Ch] != sz) {
-            Sz[Ch] = sz;
-            tmp1_d.resize(sz);
-        }
-        result_ptr = thrust::raw_pointer_cast(tmp1_d.data() + ist);
-        break;
-    default:
-        break;
-    }
+    int outIdx = y * width + x;
+    phaseOut[outIdx] = atan2f(sumSin, sumCos);
 }
 
-int main()
-{
-	std::cout << "Start";
+void computePhaseMap(const vector<GpuMat>& gpuStack, const vector<float>& zVals, GpuMat& phaseMap) {
+    int numFrames = gpuStack.size();
+    int width = gpuStack[0].cols;
+    int height = gpuStack[0].rows;
 
-    readZPosition(IMG_READ_PATH);
-    readImage(IMG_READ_PATH);
-    InitCalc();
+    // Step 1: Precompute sin/cos(2π * Z / λ)
+    vector<float> sinPhi(numFrames), cosPhi(numFrames);
+    for (int i = 0; i < numFrames; ++i) {
+        float phi = 2.0f * PI * zVals[i] / LAMBDA_EQUIV;
+        sinPhi[i] = sinf(phi);
+        cosPhi[i] = cosf(phi);
+    }
 
+    // Step 2: Upload sin/cos arrays to GPU
+    GpuMat d_sinPhi(numFrames, 1, CV_32F), d_cosPhi(numFrames, 1, CV_32F);
+    d_sinPhi.upload(Mat(sinPhi).reshape(1, numFrames));
+    d_cosPhi.upload(Mat(cosPhi).reshape(1, numFrames));
 
-	return 0;
+    // Step 3: Create host array of image pointers
+    vector<const uchar*> imgPtrs(numFrames);
+    for (int i = 0; i < numFrames; ++i)
+        imgPtrs[i] = gpuStack[i].ptr<uchar>();
+
+    // Step 4: Upload image pointers to device
+    const uchar** d_imgPtrs;
+    cudaMalloc(&d_imgPtrs, numFrames * sizeof(uchar*));
+    cudaMemcpy(d_imgPtrs, imgPtrs.data(), numFrames * sizeof(uchar*), cudaMemcpyHostToDevice);
+
+    // Step 5: Allocate output
+    GpuMat d_phase(height, width, CV_32F);
+
+    // Step 6: Launch kernel
+    dim3 block(16, 16);
+    dim3 grid((width + block.x - 1) / block.x, (height + block.y - 1) / block.y);
+
+    computePhaseKernel << <grid, block >> > (
+        d_imgPtrs, d_sinPhi.ptr<float>(), d_cosPhi.ptr<float>(),
+        d_phase.ptr<float>(), width, height, numFrames, gpuStack[0].step
+        );
+
+    // Step 7: Error check and sync
+    cudaError_t err = cudaGetLastError();
+    if (err != cudaSuccess) {
+        cerr << "CUDA kernel failed: " << cudaGetErrorString(err) << endl;
+        cudaFree(d_imgPtrs);
+        return;
+    }
+    cudaDeviceSynchronize();
+
+    // Step 8: Output result
+    phaseMap = d_phase.clone();
+
+    // Step 9: Cleanup
+    cudaFree(d_imgPtrs);
+}
+
+void savePhaseToCSV(const Mat& phaseImage, const string& filename) {
+    ofstream file(filename);
+    if (!file.is_open()) {
+        cerr << "Error: Could not open CSV file for writing!" << endl;
+        return;
+    }
+
+    for (int i = 0; i < phaseImage.rows; ++i) {
+        for (int j = 0; j < phaseImage.cols; ++j) {
+            float phaseVal = phaseImage.at<float>(i, j);
+            file << phaseVal << ",";
+            //if (j != img.cols - 1) file << ", ";  // Avoid comma at the end of the line
+        }
+        file << "\n";  // Newline for the next row
+    }
+
+    /*for (int y = 0; y < phaseImage.rows; ++y) {
+        for (int x = 0; x < phaseImage.cols; ++x) {
+            float phaseVal = phaseImage.at<float>(y, x);
+            file << x << "," << y << "," << phaseVal << "\n";
+        }
+    }*/
+
+    file.close();
+    cout << "Saved CSV: " << filename << endl;
+}
+
+int main() {
+    const string imageDir = "E:\\Interferometry\\RAFT\\bump_img_wli_raft\\";
+    const int numFrames = 415;
+
+    vector<GpuMat> gpuStack;
+    vector<float> zVals;
+
+    if (!loadStackAndZ(imageDir, numFrames, gpuStack, zVals)) {
+        cerr << "Error loading image stack or Z values." << endl;
+        return -1;
+    }
+
+    GpuMat phaseMap;
+    computePhaseMap(gpuStack, zVals, phaseMap);
+
+    Mat cpuPhase;
+    phaseMap.download(cpuPhase);
+    savePhaseToCSV(cpuPhase, "phase_map.csv");
+
+    Mat normalized;
+    normalize(cpuPhase, normalized, 0, 255, NORM_MINMAX);
+    normalized.convertTo(normalized, CV_8U);
+    imwrite("phase_result.png", normalized);
+
+    cout << "Phase map generated and saved as 'phase_result.png' and 'phase_map.csv'" << endl;
+
+    return 0;
 }
